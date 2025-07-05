@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>统计助手 - 设置</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            background-color: #f5f7fa;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        /* TDesign 风格 */
+        .t-navbar {
+            background-color: #fff;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+        }
+        .t-card {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, 0.05);
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+        .t-form-item {
+            margin-bottom: 20px;
+        }
+        .t-form-label {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 8px;
+            display: block;
+        }
+        .t-input {
+            width: 100%;
+            height: 40px;
+            border: 1px solid #dcdcdc;
+            border-radius: 4px;
+            padding: 0 12px;
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+        .t-input:focus {
+            border-color: #0052d9;
+            outline: none;
+        }
+        .t-input-group {
+            display: flex;
+            gap: 8px;
+        }
+        .t-input-group .t-input {
+            flex: 1;
+        }
+        .t-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            height: 40px;
+            padding: 0 16px;
+            font-size: 14px;
+            font-weight: 500;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s, opacity 0.2s;
+        }
+        .t-button-primary {
+            background-color: #0052d9;
+            color: white;
+            border: none;
+        }
+        .t-button-default {
+            background-color: white;
+            color: #333;
+            border: 1px solid #dcdcdc;
+        }
+        .t-button-danger {
+            background-color: #e34d59;
+            color: white;
+            border: none;
+        }
+        .t-help-text {
+            font-size: 12px;
+            color: #888;
+            margin-top: 4px;
+        }
+        .content {
+            padding: 64px 16px 24px;
+        }
+        .t-icon {
+            font-size: 24px;
+        }
+        .t-section-title {
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 16px;
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <div class="t-navbar">
+        <div class="t-icon" onclick="history.back()">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M20 11H7.83L13.42 5.41L12 4L4 12L12 20L13.41 18.59L7.83 13H20V11Z" fill="currentColor"/>
+            </svg>
+        </div>
+        <div class="flex-1 text-center text-lg font-medium">设置</div>
+        <div style="width: 24px;"></div>
+    </div>
+
+    <!-- 主要内容 -->
+    <div class="content">
+        <!-- 文件名规则设置 -->
+        <div class="t-card">
+            <div class="t-section-title">文件名规则设置</div>
+            
+            <div class="t-form-item">
+                <label class="t-form-label">文件名匹配规则</label>
+                <input type="text" class="t-input" value="(\d+)月(\d+)日财报\.xlsx" placeholder="输入正则表达式">
+                <div class="t-help-text">使用正则表达式，括号内为捕获组，用于提取日期。例如：(\d+)月(\d+)日财报\.xlsx</div>
+            </div>
+        </div>
+
+        <!-- 数据单元格设置 -->
+        <div class="t-card">
+            <div class="t-section-title">数据单元格设置</div>
+            
+            <div class="t-form-item">
+                <label class="t-form-label">目标单元格位置</label>
+                <div class="t-input-group">
+                    <div>
+                        <input type="number" class="t-input" value="2" min="1" placeholder="行号">
+                        <div class="t-help-text">行号</div>
+                    </div>
+                    <div>
+                        <input type="number" class="t-input" value="3" min="1" placeholder="列号">
+                        <div class="t-help-text">列号</div>
+                    </div>
+                </div>
+                <div class="t-help-text">指定要提取数据的单元格位置（例如：第2行第3列对应Excel中的C2）</div>
+            </div>
+        </div>
+
+        <!-- 数据管理 -->
+        <div class="t-card">
+            <div class="t-section-title">数据管理</div>
+            
+            <div class="flex justify-between items-center">
+                <div>
+                    <div class="font-medium">已导入记录数</div>
+                    <div class="text-sm text-gray-500">共 24 条记录</div>
+                </div>
+                <button class="t-button t-button-danger">清空所有数据</button>
+            </div>
+        </div>
+
+        <!-- 恢复默认设置 -->
+        <div class="mt-6 flex justify-center">
+            <button class="t-button t-button-default">恢复默认设置</button>
+        </div>
+
+        <!-- 保存按钮 -->
+        <div class="mt-6">
+            <button class="t-button t-button-primary w-full">保存设置</button>
+        </div>
+    </div>
+</body>
+</html> 

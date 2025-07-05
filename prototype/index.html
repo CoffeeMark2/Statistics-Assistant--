@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>统计助手原型</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background-color: #f5f5f5;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        }
+        .phone-container {
+            width: 412px; /* OnePlus 12 width */
+            height: 915px; /* OnePlus 12 height */
+            border-radius: 40px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            background-color: #000;
+            padding: 10px;
+        }
+        .screen {
+            width: 100%;
+            height: 100%;
+            border-radius: 32px;
+            overflow: hidden;
+            background-color: white;
+        }
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        .prototype-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(450px, 1fr));
+            gap: 30px;
+            padding: 30px;
+        }
+        .screen-label {
+            text-align: center;
+            font-weight: bold;
+            margin-top: 15px;
+            font-size: 18px;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mx-auto py-8">
+        <h1 class="text-3xl font-bold mb-8 text-center">统计助手原型设计</h1>
+        
+        <div class="prototype-grid">
+            <!-- 主页 -->
+            <div class="flex flex-col items-center">
+                <div class="phone-container">
+                    <div class="screen">
+                        <iframe src="home.html" title="主页"></iframe>
+                    </div>
+                </div>
+                <div class="screen-label">主页</div>
+            </div>
+            
+            <!-- 设置页 -->
+            <div class="flex flex-col items-center">
+                <div class="phone-container">
+                    <div class="screen">
+                        <iframe src="settings.html" title="设置"></iframe>
+                    </div>
+                </div>
+                <div class="screen-label">设置</div>
+            </div>
+            
+            <!-- 添加记录 -->
+            <div class="flex flex-col items-center">
+                <div class="phone-container">
+                    <div class="screen">
+                        <iframe src="add_record.html" title="添加记录"></iframe>
+                    </div>
+                </div>
+                <div class="screen-label">添加记录</div>
+            </div>
+            
+            <!-- 文件选择 -->
+            <div class="flex flex-col items-center">
+                <div class="phone-container">
+                    <div class="screen">
+                        <iframe src="file_select.html" title="文件选择"></iframe>
+                    </div>
+                </div>
+                <div class="screen-label">文件选择</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html> 

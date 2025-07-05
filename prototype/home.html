@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>统计助手 - 主页</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tdesign-icons-vue-next/dist/index.min.css">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            background-color: #f5f7fa;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        /* TDesign 风格 */
+        .t-navbar {
+            background-color: #fff;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+        }
+        .t-card {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, 0.05);
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+        .t-tabs {
+            display: flex;
+            background-color: #fff;
+            border-radius: 6px;
+            margin-bottom: 16px;
+            overflow: hidden;
+        }
+        .t-tab {
+            flex: 1;
+            text-align: center;
+            padding: 12px 0;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        .t-tab.active {
+            color: #0052d9;
+            border-bottom: 2px solid #0052d9;
+        }
+        .t-list-item {
+            display: flex;
+            padding: 16px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .t-list-item:last-child {
+            border-bottom: none;
+        }
+        .t-amount {
+            font-weight: 500;
+        }
+        .t-amount.positive {
+            color: #00a870;
+        }
+        .t-amount.negative {
+            color: #e34d59;
+        }
+        .t-fab {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            width: 56px;
+            height: 56px;
+            border-radius: 28px;
+            background-color: #0052d9;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 8px rgba(0, 82, 217, 0.2);
+            cursor: pointer;
+            z-index: 10;
+        }
+        .t-fab-menu {
+            position: fixed;
+            bottom: 90px;
+            right: 24px;
+            display: none;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 16px;
+            z-index: 9;
+        }
+        .t-fab-item {
+            display: flex;
+            align-items: center;
+            background-color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        .t-fab-item span {
+            margin-right: 8px;
+            font-size: 14px;
+        }
+        .t-icon {
+            font-size: 24px;
+        }
+        .content {
+            padding: 64px 16px 80px;
+        }
+        .t-dashboard {
+            text-align: center;
+            padding: 24px 0;
+        }
+        .t-dashboard-title {
+            font-size: 14px;
+            color: #888;
+            margin-bottom: 8px;
+        }
+        .t-dashboard-amount {
+            font-size: 36px;
+            font-weight: bold;
+            color: #0052d9;
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <div class="t-navbar">
+        <div class="flex-1 text-center text-lg font-medium">统计助手</div>
+        <div class="t-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 8C13.1 8 14 7.1 14 6C14 4.9 13.1 4 12 4C10.9 4 10 4.9 10 6C10 7.1 10.9 8 12 8ZM12 10C10.9 10 10 10.9 10 12C10 13.1 10.9 14 12 14C13.1 14 14 13.1 14 12C14 10.9 13.1 10 12 10ZM12 16C10.9 16 10 16.9 10 18C10 19.1 10.9 20 12 20C13.1 20 14 19.1 14 18C14 16.9 13.1 16 12 16Z" fill="currentColor"/>
+            </svg>
+        </div>
+    </div>
+
+    <!-- 主要内容 -->
+    <div class="content">
+        <!-- 仪表盘卡片 -->
+        <div class="t-card t-dashboard">
+            <div class="t-dashboard-title">总金额</div>
+            <div class="t-dashboard-amount">¥ 1,234,567.89</div>
+        </div>
+
+        <!-- 时间筛选 Tabs -->
+        <div class="t-tabs">
+            <div class="t-tab">全部</div>
+            <div class="t-tab active">本月</div>
+            <div class="t-tab">本季度</div>
+            <div class="t-tab">本年</div>
+        </div>
+
+        <!-- 明细列表 -->
+        <div class="t-card">
+            <div class="text-base font-medium mb-2">明细列表</div>
+            
+            <!-- 列表项 -->
+            <div class="t-list-item">
+                <div class="flex-1">
+                    <div class="font-medium">8月5日财报</div>
+                    <div class="text-sm text-gray-500">2023-08-05</div>
+                </div>
+                <div class="t-amount positive">+¥ 12,500.00</div>
+            </div>
+            
+            <div class="t-list-item">
+                <div class="flex-1">
+                    <div class="font-medium">7月30日财报</div>
+                    <div class="text-sm text-gray-500">2023-07-30</div>
+                </div>
+                <div class="t-amount positive">+¥ 8,750.00</div>
+            </div>
+            
+            <div class="t-list-item">
+                <div class="flex-1">
+                    <div class="font-medium">季度调整</div>
+                    <div class="text-sm text-gray-500">2023-07-15</div>
+                </div>
+                <div class="t-amount negative">-¥ 3,200.00</div>
+            </div>
+            
+            <div class="t-list-item">
+                <div class="flex-1">
+                    <div class="font-medium">7月10日财报</div>
+                    <div class="text-sm text-gray-500">2023-07-10</div>
+                </div>
+                <div class="t-amount positive">+¥ 9,300.00</div>
+            </div>
+            
+            <div class="t-list-item">
+                <div class="flex-1">
+                    <div class="font-medium">7月1日财报</div>
+                    <div class="text-sm text-gray-500">2023-07-01</div>
+                </div>
+                <div class="t-amount positive">+¥ 11,200.00</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 浮动操作按钮 -->
+    <div class="t-fab">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M19 13H13V19H11V13H5V11H11V5H13V11H19V13Z" fill="white"/>
+        </svg>
+    </div>
+    
+    <!-- 浮动菜单 -->
+    <div class="t-fab-menu">
+        <div class="t-fab-item">
+            <span>导入文件</span>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M14 2H6C4.9 2 4.01 2.9 4.01 4L4 20C4 21.1 4.89 22 5.99 22H18C19.1 22 20 21.1 20 20V8L14 2ZM16 18H8V16H16V18ZM16 14H8V12H16V14ZM13 9V3.5L18.5 9H13Z" fill="#0052d9"/>
+            </svg>
+        </div>
+        <div class="t-fab-item">
+            <span>手动添加</span>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M19 13H13V19H11V13H5V11H11V5H13V11H19V13Z" fill="#0052d9"/>
+            </svg>
+        </div>
+    </div>
+</body>
+</html> 
