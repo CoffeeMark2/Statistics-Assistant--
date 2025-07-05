@@ -1,0 +1,55 @@
+<view class="container">
+  <!-- 文件名规则设置 -->
+  <view class="card">
+    <view class="section-title">文件名规则设置</view>
+    
+    <view class="form-item">
+      <view class="form-label">文件名匹配规则</view>
+      <t-input value="{{filenamePattern}}" placeholder="输入正则表达式" bind:change="onPatternChange" />
+      <view class="help-text">使用正则表达式，括号内为捕获组，用于提取日期。例如：(\d+)月(\d+)日财报\.xlsx</view>
+    </view>
+  </view>
+
+  <!-- 数据单元格设置 -->
+  <view class="card">
+    <view class="section-title">数据单元格设置</view>
+    
+    <view class="form-item">
+      <view class="form-label">目标单元格位置</view>
+      <view class="cell-input-group">
+        <view class="cell-input-item">
+          <t-input type="number" value="{{rowIndex}}" placeholder="行号" bind:change="onRowChange" />
+          <view class="help-text">行号</view>
+        </view>
+        <view class="cell-input-item">
+          <t-input type="number" value="{{columnIndex}}" placeholder="列号" bind:change="onColumnChange" />
+          <view class="help-text">列号</view>
+        </view>
+      </view>
+      <view class="help-text">指定要提取数据的单元格位置（例如：第2行第3列对应Excel中的C2）</view>
+    </view>
+  </view>
+
+  <!-- 数据管理 -->
+  <view class="card">
+    <view class="section-title">数据管理</view>
+    
+    <view class="data-management">
+      <view>
+        <view class="data-count-title">已导入记录数</view>
+        <view class="data-count-value">共 {{recordCount}} 条记录</view>
+      </view>
+      <t-button theme="danger" size="small" bind:tap="onClearAllData">清空所有数据</t-button>
+    </view>
+  </view>
+
+  <!-- 恢复默认设置 -->
+  <view class="reset-button-container">
+    <t-button theme="default" bind:tap="onResetSettings">恢复默认设置</t-button>
+  </view>
+
+  <!-- 保存按钮 -->
+  <view class="save-button-container">
+    <t-button theme="primary" block bind:tap="onSaveSettings">保存设置</t-button>
+  </view>
+</view> 

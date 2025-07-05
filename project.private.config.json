@@ -3,7 +3,7 @@
   "projectname": "Statistics%20Assistant%E2%80%8B%E2%80%8B",
   "setting": {
     "compileHotReLoad": true,
-    "urlCheck": true,
+    "urlCheck": false,
     "coverView": false,
     "lazyloadPlaceholderEnable": false,
     "skylineRenderEnable": true,

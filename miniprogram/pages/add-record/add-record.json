@@ -1,0 +1,12 @@
+{
+  "navigationBarTitleText": "添加记录",
+  "usingComponents": {
+    "t-input": "/miniprogram_npm/tdesign-miniprogram/input/input",
+    "t-textarea": "/miniprogram_npm/tdesign-miniprogram/textarea/textarea",
+    "t-radio": "/miniprogram_npm/tdesign-miniprogram/radio/radio",
+    "t-radio-group": "/miniprogram_npm/tdesign-miniprogram/radio-group/radio-group",
+    "t-button": "/miniprogram_npm/tdesign-miniprogram/button/button",
+    "t-date-picker": "/miniprogram_npm/tdesign-miniprogram/date-time-picker/date-time-picker",
+    "t-toast": "/miniprogram_npm/tdesign-miniprogram/toast/toast"
+  }
+} 

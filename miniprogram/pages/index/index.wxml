@@ -1,0 +1,50 @@
+<!--index.wxml-->
+<scroll-view class="scrollarea" scroll-y type="list">
+  <view class="container">
+    <!-- 仪表盘卡片 -->
+    <view class="card dashboard">
+      <view class="dashboard-title">总金额</view>
+      <view class="dashboard-amount">¥ {{totalAmount}}</view>
+    </view>
+
+    <!-- 时间筛选 Tabs -->
+    <t-tabs value="{{activeTab}}" bind:change="onTabChange">
+      <t-tab-panel label="全部" value="all" />
+      <t-tab-panel label="本月" value="month" />
+      <t-tab-panel label="本季度" value="quarter" />
+      <t-tab-panel label="本年" value="year" />
+    </t-tabs>
+
+    <!-- 明细列表 -->
+    <view class="card">
+      <view class="section-title">明细列表</view>
+      
+      <!-- 列表项 -->
+      <t-swipe-cell wx:for="{{records}}" wx:key="id" right="{{swipeActions}}">
+        <view class="record-item">
+          <view class="record-info">
+            <view class="record-title">{{item.title}}</view>
+            <view class="record-date">{{item.date}}</view>
+          </view>
+          <view class="record-amount {{item.amount >= 0 ? 'amount-positive' : 'amount-negative'}}">
+            {{item.amount >= 0 ? '+' : ''}}¥ {{item.formattedAmount}}
+          </view>
+        </view>
+      </t-swipe-cell>
+
+      <!-- 空状态 -->
+      <t-empty wx:if="{{records.length === 0}}" icon="info-circle-filled" description="暂无记录" />
+    </view>
+  </view>
+
+  <!-- 浮动操作按钮 -->
+  <t-fab icon="add" bind:click="onFabClick" aria-label="添加"></t-fab>
+
+  <!-- 操作菜单 -->
+  <t-popup visible="{{showActionMenu}}" bind:visible-change="onActionMenuClose" placement="bottom">
+    <view class="action-menu">
+      <t-cell title="导入文件" leftIcon="file" hover arrow bind:click="onImportFileClick" />
+      <t-cell title="手动添加" leftIcon="add-circle" hover arrow bind:click="onAddRecordClick" />
+    </view>
+  </t-popup>
+</scroll-view>
