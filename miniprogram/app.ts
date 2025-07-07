@@ -1,5 +1,6 @@
 // app.ts
-import { formatNumber } from './utils/util';
+import { formatNumber, formatTime } from './utils/util';
+import { getRecords, saveRecords } from './utils/storage';
 
 App<IAppOption>({
   globalData: {
@@ -12,12 +13,21 @@ App<IAppOption>({
   },
 
   onLaunch() {
-    // 加载设置和记录
+    // onLaunch 中不再主动加载所有记录，交由页面自行处理
     this.loadSettings();
-    this.loadRecords();
+
+    // 保留原有的logs处理逻辑
+    const logs = wx.getStorageSync('logs') || []
+    const logsWithFormat = logs.map((log: number) => {
+      return {
+        date: formatTime(new Date(log)),
+        timeStamp: log
+      }
+    })
+    wx.setStorageSync('logs', logsWithFormat)
   },
 
-  // 加载设置
+  // 加载设置 - 仍然从缓存读取
   loadSettings() {
     try {
       const settings = wx.getStorageSync('settings');
@@ -29,30 +39,30 @@ App<IAppOption>({
     }
   },
 
-  // 加载记录
+  // 加载记录 - 改为从文件读取
   loadRecords() {
     try {
-      const records = wx.getStorageSync('records') || [];
+      const records = getRecords();
       this.globalData.records = records;
     } catch (e) {
-      console.error('加载记录失败:', e);
+      console.error('从文件加载记录失败:', e);
     }
   },
 
-  // 保存记录
-  saveRecords(records: any[]) {
+  // 保存记录 - 改为写入文件
+  saveRecords(records: RecordItem[]): boolean {
     try {
       this.globalData.records = records;
-      wx.setStorageSync('records', records);
+      saveRecords(records); // 直接调用文件存储
       return true;
     } catch (e) {
-      console.error('保存记录失败:', e);
+      console.error('保存记录到文件失败:', e);
       return false;
     }
   },
 
-  // 添加记录
-  addRecord(record: any) {
+  // 添加记录 - 逻辑不变，但依赖 saveRecords
+  addRecord(record: RecordItem): boolean {
     try {
       const records = [record, ...this.globalData.records];
       return this.saveRecords(records);
@@ -62,8 +72,8 @@ App<IAppOption>({
     }
   },
 
-  // 删除记录
-  deleteRecord(id: string) {
+  // 删除记录 - 逻辑不变，但依赖 saveRecords
+  deleteRecord(id: string): boolean {
     try {
       const records = this.globalData.records.filter((r: any) => r.id !== id);
       return this.saveRecords(records);
@@ -73,13 +83,13 @@ App<IAppOption>({
     }
   },
 
-  // 计算总金额
-  calculateTotalAmount(this: IAppOption,records: RecordItem[] = this.globalData.records) {
+  // 计算总金额 - 不变
+  calculateTotalAmount(this: IAppOption, records: RecordItem[] = this.globalData.records) {
     const total = records.reduce((sum, record) => sum + record.amount, 0);
     return formatNumber(total);
   },
 
-  // 按时间范围筛选记录
+  // 按时间范围筛选记录 - 不变
   filterRecordsByTimeRange(range: string) {
     const now = new Date();
     const records = this.globalData.records;

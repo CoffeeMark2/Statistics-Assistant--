@@ -3,7 +3,7 @@
         <form bindsubmit="onFormSubmit">
             <!-- 日期选择 -->
             <view class="form-item">
-                <t-cell title="选择日期" hover note="{{dateText || ''}}" arrow data-mode="date" bindtap="showPicker" class="test" t-class="panel-item" />
+                <t-cell title="选择日期" hover note="{{dateFormatted || ''}}" arrow data-mode="date" bindtap="showPicker" class="test" t-class="panel-item" />
 
                 <!-- 年月日 -->
                 <t-date-time-picker auto-close title="选择日期" s howWeek visible="{{dateVisible}}" mode="date" default-value="{{date}}" value="{{date}}" format="YYYY-MM-DD ddd" start="2021-01-01" end="2099-12-31" filter="{{filter}}" popup-props="{{popupProps}}" bindchange="onConfirm" bindpick="onColumnChange" bindcancel="hidePicker" bindclose="handleClose" />

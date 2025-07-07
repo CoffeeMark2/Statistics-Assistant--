@@ -1,4 +1,5 @@
 import { formatNumber, formatTime } from '../../utils/util';
+import { getRecords, saveRecords } from '../../utils/storage';
 
 Page({
     data: {
@@ -11,7 +12,6 @@ Page({
         // date selector
         mode: '',
         dateVisible: false,
-        dateText: '',
 
         filter(type: string, options: { value: number; label: string }[]) {
             if (type === 'year') {
@@ -141,12 +141,13 @@ Page({
         // 保存记录
         try {
             // 获取现有记录
-            const records = wx.getStorageSync('records') || [];
+            const records = getRecords();
             // 添加新记录
             records.unshift(record);
             console.log("submit succees",record)
             // 保存回存储
-            wx.setStorageSync('records', records);
+            saveRecords(records);
+            console.log("getFileRecords",getRecords())
 
             wx.showToast({
                 title: '添加成功',
