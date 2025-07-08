@@ -14,7 +14,14 @@ Page({
         totalAmount: '0.00',
         filenamePattern: '(\\d+)月(\\d+)日.*\\.xlsx?$',
         rowIndex: 2,
-        columnIndex: 3
+        columnIndex: 3,
+
+        // for year picker
+        yearVisible: false,
+        yearText: new Date().getFullYear(),
+        yearValue: new Date(new Date().getFullYear(), 0, 1).getTime(),
+        start: '2020-01-01 00:00:00',
+        end: '2060-09-09 12:12:12',
     },
 
     onLoad() {
@@ -37,6 +44,36 @@ Page({
             console.error('加载设置失败:', e);
         }
     },
+
+    // #region 年份选择器相关方法
+    showYearPicker() {
+        this.setData({ yearVisible: true });
+    },
+
+    hideYearPicker() {
+        this.setData({ yearVisible: false });
+    },
+
+    onYearConfirm(e: any) {
+        const { value } = e.detail;
+        // 从picker返回的值中提取年份
+        const year = parseInt(value.replace('年', ''));
+        const newTimestamp = new Date(year, 0, 1).getTime();
+        console.log("select",year)
+        this.setData({
+            yearText: year,
+            yearValue: newTimestamp,
+            yearVisible: false,
+        });
+        this.hideYearPicker();
+
+        // 年份变更后，需要重新生成预览
+        this.previewValidFiles();
+    },
+    onColumnChange() {
+        // console.log('pick', e.detail.value);
+    },
+    // #endregion
 
     // 选择文件
     onSelectFile() {
@@ -88,14 +125,14 @@ Page({
 
     // 预览有效文件
     previewValidFiles() {
-        const validFiles = this.data.files.filter(file => file.valid && file.selected);
-        const currentYear = new Date().getFullYear();
+        const validFiles = this.data.files.filter((file: any) => file.valid && file.selected);
+        const yearToUse = this.data.yearText;
 
         // 这里应该实际读取Excel文件内容
         // 由于微信小程序环境限制，这里仅做模拟
-        const previewFiles = validFiles.map(file => {
+        const previewFiles = validFiles.map((file: any) => {
             // 从文件名中提取日期
-            const date = extractDateFromFilename(file.name, this.data.filenamePattern, currentYear);
+            const date = extractDateFromFilename(file.name, this.data.filenamePattern, yearToUse);
 
             // 模拟从Excel中读取的金额
             const amount = Math.floor(Math.random() * 10000) + 1000; // 随机生成1000-11000之间的金额
@@ -111,21 +148,6 @@ Page({
 
         this.setData({ previewFiles });
         this.calculateTotal();
-    },
-
-    // 文件选中状态变更
-    onFileCheckChange(e: any) {
-        const index = e.currentTarget.dataset.index;
-        const selected = e.detail.value;
-
-        // 更新文件选中状态
-        const files = [...this.data.files];
-        files[index].selected = selected;
-
-        this.setData({ files });
-
-        // 重新预览有效文件
-        this.previewValidFiles();
     },
 
     // 计算总金额和选中数量

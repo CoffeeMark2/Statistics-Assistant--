@@ -5,6 +5,8 @@
     "t-icon": "tdesign-miniprogram/icon/icon",
     "t-checkbox": "tdesign-miniprogram/checkbox/checkbox",
     "t-empty": "tdesign-miniprogram/empty/empty",
-    "t-toast": "tdesign-miniprogram/toast/toast"
+    "t-toast": "tdesign-miniprogram/toast/toast",
+    "t-cell": "tdesign-miniprogram/cell/cell",
+    "t-date-time-picker": "tdesign-miniprogram/date-time-picker/date-time-picker"
   }
 } 

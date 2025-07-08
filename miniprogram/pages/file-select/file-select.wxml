@@ -1,57 +1,60 @@
 <view class="container">
-  <view class="card">
-    <view class="file-select-header">
-      <view class="section-title">从微信聊天记录选择</view>
-      <t-button theme="default" size="small" icon="add" bind:tap="onSelectFile">选择文件</t-button>
-    </view>
-
-    <!-- 文件列表 -->
-    <block wx:if="{{files.length > 0}}">
-      <view class="file-list">
-        <view wx:for="{{files}}" wx:key="index" class="file-item">
-          <view class="file-icon">
-            <t-icon name="file" size="24px" color="{{item.valid ? '#0052d9' : '#999'}}" />
-          </view>
-          <view class="file-info">
-            <view class="file-name {{!item.valid ? 'invalid' : ''}}">{{item.name}}</view>
-            <view class="file-meta">
-              <text class="file-size">{{item.size}} · {{item.type}}</text>
-              <text wx:if="{{!item.valid}}" class="file-reason">{{item.reason}}</text>
-            </view>
-          </view>
-          <t-checkbox value="{{item.selected}}" disabled="{{!item.valid}}" bind:change="onFileCheckChange" data-index="{{index}}" />
+    <view class="card">
+        <view class="file-select-header">
+            <view class="section-title">从微信聊天记录选择</view>
+            <t-button theme="default" size="small" icon="add" bind:tap="onSelectFile">选择文件</t-button>
         </view>
-      </view>
-    </block>
 
-    <!-- 空状态 -->
-    <t-empty wx:else icon="file" description="点击'选择文件'从微信聊天记录中选择Excel文件" />
-  </view>
+        <!-- 年份选择 -->
+        <t-cell title="选择年份" hover note="{{yearText}}" arrow data-mode="year" bindtap="showYearPicker" />
+        <t-date-time-picker title="选择年份" visible="{{yearVisible}}" mode="year" value="{{yearValue}}" format="YYYY年" start="2021-01-01" end="2099-12-31" bindchange="onYearConfirm" bindpick="onColumnChange" bindcancel="hideYearPicker" start="{{start}}" end="{{end}}" />
 
-  <!-- 文件解析预览 -->
-  <view class="card" wx:if="{{previewFiles.length > 0}}">
-    <view class="section-title">文件解析预览</view>
-    
-    <view wx:for="{{previewFiles}}" wx:key="index" class="preview-item">
-      <view class="preview-title">{{item.name}}</view>
-      <view class="preview-label">单元格 {{item.cellPosition}} 的值：</view>
-      <view class="preview-value {{item.amount >= 0 ? 'amount-positive' : 'amount-negative'}}">
-        ¥ {{item.formattedAmount}}
-      </view>
+        <!-- 文件列表 -->
+        <block wx:if="{{files.length > 0}}">
+            <view class="file-list">
+                <view wx:for="{{files}}" wx:key="index" class="file-item">
+                    <view class="file-icon">
+                        <t-icon name="file" size="24px" color="{{item.valid ? '#0052d9' : '#999'}}" />
+                    </view>
+                    <view class="file-info">
+                        <view class="file-name {{!item.valid ? 'invalid' : ''}}">{{item.name}}</view>
+                        <view class="file-meta">
+                            <text class="file-size">{{item.size}} · {{item.type}}</text>
+                            <text wx:if="{{!item.valid}}" class="file-reason">{{item.reason}}</text>
+                        </view>
+                    </view>
+                </view>
+            </view>
+        </block>
+
+        <!-- 空状态 -->
+        <t-empty wx:else icon="file" description="点击'选择文件'从微信聊天记录中选择Excel文件" />
     </view>
-  </view>
+
+    <!-- 文件解析预览 -->
+    <view class="card" wx:if="{{previewFiles.length > 0}}">
+        <view class="section-title">文件解析预览</view>
+
+        <view wx:for="{{previewFiles}}" wx:key="index" class="preview-item">
+            <view class="preview-title">{{item.name}}</view>
+            <view class="preview-label">单元格 {{item.cellPosition}} 的值：</view>
+            <view class="preview-value {{item.amount >= 0 ? 'amount-positive' : 'amount-negative'}}">
+                ¥ {{item.formattedAmount}}
+            </view>
+        </view>
+    </view>
 </view>
 
 <!-- 底部操作栏 -->
 <view class="footer-bar">
-  <view class="footer-info">
-    <view>已选择 <text class="footer-count">{{selectedCount}}</text> 个文件</view>
-    <view>总金额：<text class="footer-amount">¥ {{totalAmount}}</text></view>
-  </view>
-  <view class="button-group">
-    <t-button theme="default" bind:tap="onCancel">取消</t-button>
-    <t-button theme="primary" bind:tap="onImport" disabled="{{selectedCount === 0}}">导入数据</t-button>
-  </view>
+    <view class="footer-info">
+        <view>已选择 <text class="footer-count">{{selectedCount}}</text> 个文件</view>
+        <view>总金额：<text class="footer-amount">¥ {{totalAmount}}</text></view>
+    </view>
+    <view class="button-group">
+        <t-button theme="default" bind:tap="onCancel">取消</t-button>
+        <t-button theme="primary" bind:tap="onImport" disabled="{{selectedCount === 0}}">导入数据</t-button>
+    </view>
 </view>
 
-<t-toast id="t-toast" /> 
+<t-toast id="t-toast" />
