@@ -23,10 +23,6 @@ Page({
         this.loadRecords();
     },
 
-    onLoad() {
-        // This logic is now handled by onShow to ensure data is fresh
-    },
-
     loadRecords() {
         const records = getRecords();
         this.setData({

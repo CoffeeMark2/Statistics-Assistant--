@@ -14,7 +14,10 @@
           </view>
           <view class="file-info">
             <view class="file-name {{!item.valid ? 'invalid' : ''}}">{{item.name}}</view>
-            <view class="file-size">{{item.size}} · {{item.type}}</view>
+            <view class="file-meta">
+              <text class="file-size">{{item.size}} · {{item.type}}</text>
+              <text wx:if="{{!item.valid}}" class="file-reason">{{item.reason}}</text>
+            </view>
           </view>
           <t-checkbox value="{{item.selected}}" disabled="{{!item.valid}}" bind:change="onFileCheckChange" data-index="{{index}}" />
         </view>

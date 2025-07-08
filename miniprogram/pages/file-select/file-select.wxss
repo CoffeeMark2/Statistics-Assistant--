@@ -39,6 +39,19 @@
   text-decoration: line-through;
 }
 
+.file-meta {
+  display: flex;
+  align-items: center;
+  font-size: 24rpx;
+  color: #999;
+}
+
+.file-reason {
+  margin-left: 16rpx;
+  color: #e34d59; /* TDesign 红色 */
+  font-weight: 500;
+}
+
 .file-size {
   font-size: 24rpx;
   color: #888;
