@@ -33,23 +33,32 @@
   <!-- 数据管理 -->
   <view class="card">
     <view class="section-title">数据管理</view>
-    
-    <view class="data-management">
-      <view>
-        <view class="data-count-title">已导入记录数</view>
-        <view class="data-count-value">共 {{recordCount}} 条记录</view>
-      </view>
-      <t-button theme="danger" size="small" bind:tap="onClearAllData">清空所有数据</t-button>
-    </view>
+    <t-cell title="当前记录总数" note="{{recordCount}} 条" />
+    <t-cell title="导入数据" hover arrow note="从备份文件恢复" bind:tap="onImportData" />
+    <t-cell title="导出数据" hover arrow note="备份所有记录到文件" bind:tap="onExportData" />
+    <t-cell title="清空全部记录" hover arrow bind:tap="showClearDialog" t-class-title="cell-title-danger" />
   </view>
 
-  <!-- 恢复默认设置 -->
-  <view class="reset-button-container">
-    <t-button theme="default" bind:tap="onResetSettings">恢复默认设置</t-button>
+  <!-- 危险操作 -->
+  <view class="card">
+    <view class="section-title">系统设置</view>
+    <t-cell title="恢复默认设置" hover arrow bind:tap="onRestoreDefault" />
   </view>
 
   <!-- 保存按钮 -->
   <view class="save-button-container">
-    <t-button theme="primary" block bind:tap="onSaveSettings">保存设置</t-button>
+    <t-button theme="primary" block bind:tap="onSave">保存设置</t-button>
   </view>
+
+  <!-- 清空确认对话框 -->
+  <t-dialog
+    visible="{{dialogVisible}}"
+    title="确认操作"
+    content="此操作将永久删除所有记录，且无法恢复。您确定要继续吗？"
+    confirm-btn="我意已决"
+    cancel-btn="再想想"
+    bind:confirm="onClearRecords"
+    bind:cancel="hideClearDialog"
+  >
+  </t-dialog>
 </view> 

@@ -29,5 +29,9 @@
 }
 
 .save-button-container {
-  margin-top: 32rpx;
+  padding: 24rpx;
+}
+
+.cell-title-danger {
+  color: #e34d59 !important; /* TDesign 红色 */
 } 

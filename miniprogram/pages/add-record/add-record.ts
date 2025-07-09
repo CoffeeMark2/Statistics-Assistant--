@@ -157,7 +157,7 @@ Page({
             // 延迟返回
             setTimeout(() => {
                 wx.navigateBack();
-            }, 1500);
+            }, 1000);
         } catch (e) {
             console.error('保存记录失败:', e);
             wx.showToast({
