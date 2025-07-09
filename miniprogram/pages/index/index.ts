@@ -2,15 +2,20 @@
 import { formatNumber } from '../../utils/util';
 import { getRecords, saveRecords } from '../../utils/storage';
 
+// 假设 RecordItem 定义在全局类型文件中
+// 如果没有，需要在这里或者typings中定义
+// interface RecordItem { ... }
+
 // 获取应用实例
 const app = getApp<IAppOption>();
 
 Page({
     data: {
-        activeTab: 'month',
+        activeTab: 'all', // 默认显示全部
         totalAmount: '0.00',
         showActionMenu: false,
-        records: [] as RecordItem[],
+        allRecords: [] as RecordItem[], // 新增：存储所有记录
+        records: [] as RecordItem[],    // 存储筛选后用于显示的记录
         swipeActions: [
             {
                 text: '删除',
@@ -24,18 +29,19 @@ Page({
     },
 
     loadRecords() {
-        const records = getRecords();
+        const allRecords = getRecords();
         this.setData({
-            records,
+            allRecords,
         });
-        this.calculateTotalAmount();
+        // 加载后，立即按当前激活的Tab进行筛选
+        this.filterRecordsByTimeRange(this.data.activeTab);
     },
 
     // 计算总金额
-    calculateTotalAmount() {
-        const total = this.data.records.reduce((sum, record) => sum + record.amount, 0);
+    calculateTotalAmount(recordsToCalculate: any[]) {
+        const total = recordsToCalculate.reduce((sum, record) => sum + record.amount, 0);
         this.setData({
-            totalAmount: formatNumber(total)
+            totalAmount: formatNumber(total),
         });
     },
 
@@ -43,18 +49,49 @@ Page({
     onTabChange(e: any) {
         const { value } = e.detail;
         this.setData({
-            activeTab: value
+            activeTab: value,
         });
-
-        // 根据选中的Tab筛选数据
         this.filterRecordsByTimeRange(value);
     },
 
     // 根据时间范围筛选记录
     filterRecordsByTimeRange(range: string) {
-        // 实际应用中，这里应该从存储中获取所有记录，然后根据时间范围进行筛选
-        // 这里仅做演示
-        console.log(`筛选${range}范围的记录`);
+        const now = new Date();
+        const { allRecords } = this.data;
+        let filteredRecords = [];
+
+        switch (range) {
+            case 'month': {
+                const year = now.getFullYear();
+                const month = now.getMonth();
+                const startOfMonth = new Date(year, month, 1).getTime();
+                filteredRecords = allRecords.filter((r: any) => r.timestamp >= startOfMonth);
+                break;
+            }
+            case 'quarter': {
+                const year = now.getFullYear();
+                const quarter = Math.floor(now.getMonth() / 3);
+                const startOfQuarter = new Date(year, quarter * 3, 1).getTime();
+                filteredRecords = allRecords.filter((r: any) => r.timestamp >= startOfQuarter);
+                break;
+            }
+            case 'year': {
+                const year = now.getFullYear();
+                const startOfYear = new Date(year, 0, 1).getTime();
+                filteredRecords = allRecords.filter((r: any) => r.timestamp >= startOfYear);
+                break;
+            }
+            case 'all':
+            default:
+                filteredRecords = [...allRecords];
+                break;
+        }
+
+        this.setData({
+            records: filteredRecords,
+        });
+        // 基于筛选后的记录重新计算总金额
+        this.calculateTotalAmount(filteredRecords);
     },
 
     // 点击浮动按钮
@@ -106,18 +143,14 @@ Page({
             content: '确定要删除这条记录吗？',
             success: (res) => {
                 if (res.confirm) {
-                    // 删除记录
-                    const deletedRecord = this.data.records.find((item: any) => item.id === id);
-                    let newRecords = this.data.records.filter((item: any) => item.id !== id);
+                    // 重要：同时从 allRecords 和当前显示的 records 中删除
+                    const newAllRecords = this.data.allRecords.filter((item: any) => item.id !== id);
 
-                    // 更新文件
-                    saveRecords(newRecords);
+                    saveRecords(newAllRecords); // 保存全量数据
 
-                    this.setData({
-                        records: newRecords
-                    });
-                    this.calculateTotalAmount();
-                    console.log("delete success: ",deletedRecord)
+                    // 重新加载和筛选，以确保数据一致性
+                    this.loadRecords();
+
                     wx.showToast({ title: '删除成功', icon: 'success' });
                 }
             }

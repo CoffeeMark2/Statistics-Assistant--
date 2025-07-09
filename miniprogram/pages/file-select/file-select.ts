@@ -286,7 +286,7 @@ Page({
 
             wx.showToast({ title: '导入成功', icon: 'success' });
 
-            setTimeout(() => wx.navigateBack(), 1500);
+            setTimeout(() => wx.navigateBack(), 1000);
         } catch (e) {
             console.error('保存记录失败:', e);
             wx.showToast({ title: '导入失败', icon: 'error' });

@@ -10,9 +10,9 @@
         <!-- 时间筛选 Tabs -->
         <t-tabs value="{{activeTab}}" bind:change="onTabChange">
             <t-tab-panel label="全部" value="all" />
-            <t-tab-panel label="本月" value="month" />
-            <t-tab-panel label="本季度" value="quarter" />
             <t-tab-panel label="本年" value="year" />
+            <t-tab-panel label="本季度" value="quarter" />
+            <t-tab-panel label="本月" value="month" />
         </t-tabs>
 
         <!-- 明细列表 -->
@@ -20,7 +20,7 @@
             <view class="section-title">明细列表</view>
 
             <!-- 列表项 -->
-            <t-swipe-cell wx:for="{{records}}" wx:key="id" right="{{swipeActions}}"  bind:click="onSwipeDelete" data-id="{{item.id}}">
+            <t-swipe-cell wx:for="{{records}}" wx:key="id" right="{{swipeActions}}" bind:click="onSwipeDelete" data-id="{{item.id}}">
                 <view class="record-item">
                     <view class="record-info">
                         <view class="record-title">{{item.title}}</view>

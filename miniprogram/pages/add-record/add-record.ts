@@ -1,4 +1,4 @@
-import { formatNumber, formatTime } from '../../utils/util';
+import { formatNumber } from '../../utils/util';
 import { getRecords, saveRecords } from '../../utils/storage';
 
 Page({
