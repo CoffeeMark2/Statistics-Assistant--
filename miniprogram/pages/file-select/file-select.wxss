@@ -81,8 +81,17 @@
 }
 
 .preview-value {
-  font-size: 32rpx;
-  font-weight: 500;
+  font-size: 36rpx;
+  font-weight: bold;
+}
+
+.preview-error {
+  font-size: 28rpx;
+  color: #e34d59; /* TDesign 红色 */
+}
+
+.amount-positive {
+  color: #00a870; /* TDesign 绿色 */
 }
 
 .footer-bar {

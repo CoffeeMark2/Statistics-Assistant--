@@ -6,8 +6,8 @@ App<IAppOption>({
   globalData: {
     records: [],
     settings: {
-      filenamePattern: '(\\d+)月(\\d+)日财报\\.xlsx',
-      rowIndex: '2',
+      filenamePattern: '(\\d+)月(\\d+)日.*\\.xlsx?$',
+      rowIndex: '26',
       columnIndex: '3'
     }
   },

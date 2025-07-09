@@ -1,10 +1,9 @@
 import { formatNumber, extractDateFromFilename, parseAmount } from '../../utils/util';
 import { getRecords, saveRecords } from '../../utils/storage';
 
-// 引入解析Excel的库
-// 注意：实际项目中需要安装并引入一个Excel解析库，如xlsx或者SheetJS
-// 这里仅做模拟
 
+const fs = wx.getFileSystemManager();
+const XLSX = require('../../utils/xlsx.mini.min.js');
 
 Page({
     data: {
@@ -13,7 +12,7 @@ Page({
         selectedCount: 0,
         totalAmount: '0.00',
         filenamePattern: '(\\d+)月(\\d+)日.*\\.xlsx?$',
-        rowIndex: 2,
+        rowIndex: 26,
         columnIndex: 3,
 
         // for year picker
@@ -59,7 +58,7 @@ Page({
         // 从picker返回的值中提取年份
         const year = parseInt(value.replace('年', ''));
         const newTimestamp = new Date(year, 0, 1).getTime();
-        console.log("select",year)
+        console.log("select", year)
         this.setData({
             yearText: year,
             yearValue: newTimestamp,
@@ -123,28 +122,93 @@ Page({
         });
     },
 
-    // 预览有效文件
-    previewValidFiles() {
+    // 预览有效文件 - 改为异步真实读取
+    async previewValidFiles() {
+        wx.showLoading({ title: '正在解析文件...' });
+
         const validFiles = this.data.files.filter((file: any) => file.valid && file.selected);
         const yearToUse = this.data.yearText;
+        const rowIndex = this.data.rowIndex;
+        const colIndex = this.data.columnIndex;
 
-        // 这里应该实际读取Excel文件内容
-        // 由于微信小程序环境限制，这里仅做模拟
-        const previewFiles = validFiles.map((file: any) => {
-            // 从文件名中提取日期
+        const previewPromises = validFiles.map(async (file: any) => {
             const date = extractDateFromFilename(file.name, this.data.filenamePattern, yearToUse);
+            const cellPosition = `${String.fromCharCode(64 + colIndex)}${rowIndex}`;
+            let amount = 0;
+            let formattedAmount = '0.00';
+            let parseError = '';
 
-            // 模拟从Excel中读取的金额
-            const amount = Math.floor(Math.random() * 10000) + 1000; // 随机生成1000-11000之间的金额
+            try {
+                // 1. 异步读取文件内容
+                const arrayBuffer = await new Promise<ArrayBuffer>((resolve, reject) => {
+                    fs.readFile({
+                        filePath: file.path,
+                        success: (res) => {
+                            const data = res.data;
+                            if (data instanceof ArrayBuffer) {
+                                console.log(`[文件: ${file.name}] -> 步骤1: 文件读取成功，得到 ArrayBuffer，大小: ${data.byteLength} 字节`);
+                                resolve(data);
+                            } else {
+                                console.log(`[文件: ${file.name}] -> 步骤1: 文件读取成功，但格式为 String，长度: ${data.length} 字符`);
+                                reject(new Error('Expected file content to be ArrayBuffer, but received string.'));
+                            }
+                        },
+                        fail: reject,
+                    });
+                });
+
+                // 2. 使用xlsx库解析
+                const workbook = XLSX.read(arrayBuffer, { type: 'array' });
+                console.log(`[文件: ${file.name}] -> 步骤2: Workbook (工作簿) 解析成功。`, workbook);
+
+                const firstSheetName = workbook.SheetNames[0];
+                const worksheet = workbook.Sheets[firstSheetName];
+                console.log(`[文件: ${file.name}] -> 步骤3a: 获取到第一个工作表，名称: "${firstSheetName}"`);
+
+                // 3. 定位单元格并提取数据
+                const cellAddress = XLSX.utils.encode_cell({ r: rowIndex - 1, c: colIndex - 1 });
+                console.log(`[文件: ${file.name}] -> 步骤3b: 根据行(${rowIndex})和列(${colIndex})计算出单元格地址: "${cellAddress}"`);
+
+                const cell = worksheet[cellAddress];
+                const rawValue = cell ? cell.v : undefined;
+                console.log(`[文件: ${file.name}] -> 步骤3c: 从单元格 "${cellAddress}" 提取到的原始值 (rawValue):`, rawValue);
+
+
+                // 4. 安全性检查和转换
+                if (rawValue === undefined || rawValue === null || rawValue === '') {
+                    parseError = '单元格为空';
+                    amount = 0;
+                } else {
+                    const parsed = parseAmount(rawValue); // 使用工具函数处理金额
+                    if (isNaN(parsed)) {
+                        parseError = `无法解析金额`;
+                        amount = 0;
+                    } else {
+                        amount = parsed;
+                    }
+                }
+
+                formattedAmount = formatNumber(amount);
+
+            } catch (e: any) {
+                console.error(`解析文件 ${file.name} 失败:`, e);
+                parseError = '文件解析失败';
+                amount = 0;
+            }
 
             return {
                 name: file.name,
                 date: date ? `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}` : '',
-                cellPosition: `${String.fromCharCode(64 + this.data.columnIndex)}${this.data.rowIndex}`,
-                amount: amount,
-                formattedAmount: formatNumber(amount)
+                cellPosition,
+                amount,
+                formattedAmount,
+                parseError // 新增错误信息字段
             };
         });
+
+        const previewFiles = await Promise.all(previewPromises);
+
+        wx.hideLoading();
 
         this.setData({ previewFiles });
         this.calculateTotal();
@@ -189,52 +253,43 @@ Page({
         wx.navigateBack();
     },
 
-    // 导入数据
+    // 导入数据 - 改为使用文件存储
     onImport() {
         if (this.data.selectedCount === 0) {
-            wx.showToast({
-                title: '请选择文件',
-                icon: 'error'
-            });
+            wx.showToast({ title: '请选择文件', icon: 'error' });
             return;
         }
 
-        // 创建记录
-        const newRecordsFromFile = this.data.previewFiles.map((file: any) => ({
-            id: Date.now() + Math.random().toString(36).substring(2, 9), // 生成唯一ID
-            title: file.name,
-            date: file.date,
-            timestamp: new Date(file.date).getTime(),
-            amount: file.amount,
-            formattedAmount: file.formattedAmount,
-            source: 'file', // 标记为文件导入
-            filename: file.name,
-            cellPosition: file.cellPosition
-        }));
+        const newRecords = this.data.previewFiles
+            .filter((file: any) => !file.parseError) // 只导入没有解析错误的文件
+            .map((file: any) => ({
+                id: Date.now() + Math.random().toString(36).substring(2, 9),
+                title: file.name,
+                date: file.date,
+                timestamp: new Date(file.date).getTime(),
+                amount: file.amount,
+                formattedAmount: file.formattedAmount,
+                source: 'file',
+                filename: file.name,
+                cellPosition: file.cellPosition
+            }));
+
+        if (newRecords.length === 0) {
+            wx.showToast({ title: '没有可导入的有效文件', icon: 'error' });
+            return;
+        }
 
         try {
-            // 获取现有记录
             const existingRecords = getRecords();
-            // 添加新记录
-            const finalRecords = [...newRecordsFromFile, ...existingRecords];
-            // 保存回文件
-            saveRecords(finalRecords);
+            const updatedRecords = [...newRecords, ...existingRecords];
+            saveRecords(updatedRecords); // 使用新的存储工具
 
-            wx.showToast({
-                title: '导入成功',
-                icon: 'success'
-            });
+            wx.showToast({ title: '导入成功', icon: 'success' });
 
-            // 延迟返回
-            setTimeout(() => {
-                wx.navigateBack();
-            }, 1500);
+            setTimeout(() => wx.navigateBack(), 1500);
         } catch (e) {
             console.error('保存记录失败:', e);
-            wx.showToast({
-                title: '导入失败',
-                icon: 'error'
-            });
+            wx.showToast({ title: '导入失败', icon: 'error' });
         }
     }
 }); 

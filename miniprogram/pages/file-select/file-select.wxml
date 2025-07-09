@@ -38,9 +38,10 @@
         <view wx:for="{{previewFiles}}" wx:key="index" class="preview-item">
             <view class="preview-title">{{item.name}}</view>
             <view class="preview-label">单元格 {{item.cellPosition}} 的值：</view>
-            <view class="preview-value {{item.amount >= 0 ? 'amount-positive' : 'amount-negative'}}">
+            <view wx:if="{{!item.parseError}}" class="preview-value {{item.amount >= 0 ? 'amount-positive' : 'amount-negative'}}">
                 ¥ {{item.formattedAmount}}
             </view>
+            <view wx:else class="preview-error">{{item.parseError}}</view>
         </view>
     </view>
 </view>
