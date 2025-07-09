@@ -15,8 +15,10 @@ interface RecordItem {
 
 interface Settings {
     filenamePattern: string;
-    rowIndex: string;
-    columnIndex: string;
+    rowKeyword: string;
+    rowSearchColumn: number;
+    colKeyword: string;
+    colSearchRow: number;
 }
 
 interface IAppOption {

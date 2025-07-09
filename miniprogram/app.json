@@ -7,7 +7,7 @@
   ],
   "window": {
     "navigationBarTextStyle": "black",
-    "navigationBarTitleText": "统计助手",
+    "navigationBarTitleText": "记账的小咖啡",
     "navigationBarBackgroundColor": "#ffffff"
   },
   "lazyCodeLoading": "requiredComponents",

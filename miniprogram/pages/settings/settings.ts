@@ -1,10 +1,7 @@
 import { getRecords, saveRecords } from '../../utils/storage';
 
 const defaultSettings = {
-    // --- 旧设置 ---
     filenamePattern: '(\\d+)月(\\d+)日.*\\.xlsx?$',
-
-
     // --- 新增的动态查找设置 ---
     rowKeyword: '小计',
     rowSearchColumn: 1, // 1代表A列
@@ -17,6 +14,7 @@ Page({
         filenamePattern: '',
         recordCount: 0,
         dialogVisible: false,
+        helpDialogVisible: false, // 控制帮助对话框
         // 新增字段
         rowKeyword: '',
         rowSearchColumn: '',
@@ -79,6 +77,14 @@ Page({
             console.error('保存设置失败:', e);
             return false;
         }
+    },
+
+    onInputChange(e: any) {
+        const { field } = e.currentTarget.dataset;
+        console.log(field);
+        this.setData({
+            [field]: e.detail.value,
+        });
     },
 
     onExportData() {
@@ -203,7 +209,15 @@ Page({
         }
     },
 
-    
+    // #region 帮助对话框方法
+    showHelpDialog() {
+        this.setData({ helpDialogVisible: true });
+    },
+
+    hideHelpDialog() {
+        this.setData({ helpDialogVisible: false });
+    },
+    // #endregion
 
     onRestoreDefault() {
         this.setData({

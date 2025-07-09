@@ -5,13 +5,14 @@
     <view class="section-title">数据提取规则</view>
     <t-input label="文件名匹配规则" placeholder="请输入正则表达式" value="{{filenamePattern}}" data-field="filenamePattern" bind:change="onInputChange" />
     
-    <view class="subsection-title">按关键词查找行</view>
+    <view class="subsection-header">
+      <view class="subsection-title">按行列关键词定位数据单元</view>
+      <t-icon name="help-circle" size="20px" color="#888" bind:tap="showHelpDialog"/>
+    </view>
     <t-input label="行关键词" placeholder="如: 小计" value="{{rowKeyword}}" data-field="rowKeyword" bind:change="onInputChange" />
-    <t-input label="在哪列搜索" type="number" placeholder="1代表A列" value="{{rowSearchColumn}}" data-field="rowSearchColumn" bind:change="onInputChange" />
-
-    <view class="subsection-title">按关键词查找列</view>
+    <t-input label="行关键字所在列" type="number" placeholder="1代表A列" value="{{rowSearchColumn}}" data-field="rowSearchColumn" bind:change="onInputChange" />
     <t-input label="列关键词" placeholder="如: 大件车间" value="{{colKeyword}}" data-field="colKeyword" bind:change="onInputChange" />
-    <t-input label="在哪行搜索" type="number" placeholder="如: 2" value="{{colSearchRow}}" data-field="colSearchRow" bind:change="onInputChange" />
+    <t-input label="列关键字所在行" type="number" placeholder="如: 2" value="{{colSearchRow}}" data-field="colSearchRow" bind:change="onInputChange" />
   </view>
 
   <!-- 数据统计 -->
@@ -43,6 +44,17 @@
     cancel-btn="再想想"
     bind:confirm="onClearRecords"
     bind:cancel="hideClearDialog"
+  >
+  </t-dialog>
+
+  <!-- 新增的帮助对话框 -->
+  <t-dialog
+    visible="{{helpDialogVisible}}"
+    title="查看示例"
+    content="该功能用于在Excel中动态查找数据。例如，系统会先在A列（行关键字所在列=1）找到包含“小计”（行关键词）的行，再在第2行（列关键字所在行=2）找到包含“大件车间”（列关键词）的列，最终读取这两个行列交叉位置的单元格数据。"
+    confirm-btn="我明白了"
+    bind:confirm="hideHelpDialog"
+    show-cancel-button="{{false}}"
   >
   </t-dialog>
 </view> 

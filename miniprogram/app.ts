@@ -7,8 +7,10 @@ App<IAppOption>({
     records: [],
     settings: {
       filenamePattern: '(\\d+)月(\\d+)日.*\\.xlsx?$',
-      rowIndex: '26',
-      columnIndex: '3'
+      rowKeyword: '小计',
+      rowSearchColumn: 1,
+      colKeyword: '大件车间',
+      colSearchRow: 2,
     }
   },
 
@@ -27,12 +29,16 @@ App<IAppOption>({
     wx.setStorageSync('logs', logsWithFormat)
   },
 
-  // 加载设置 - 仍然从缓存读取
+  // 加载设置
   loadSettings() {
     try {
       const settings = wx.getStorageSync('settings');
       if (settings) {
+        // 如果有缓存，则使用缓存
         this.globalData.settings = settings;
+      } else {
+        // 如果没有缓存，则将默认设置写入缓存
+        wx.setStorageSync('settings', this.globalData.settings);
       }
     } catch (e) {
       console.error('加载设置失败:', e);
