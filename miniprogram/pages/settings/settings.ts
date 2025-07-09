@@ -6,8 +6,6 @@ const defaultSettings = {
     columnIndex: 2,
 };
 
-const fs = wx.getFileSystemManager();
-
 Page({
     data: {
         filenamePattern: '',
