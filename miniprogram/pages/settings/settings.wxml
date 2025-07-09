@@ -1,36 +1,20 @@
 <view class="container">
-  <!-- 文件名规则设置 -->
+
+  <!-- 数据提取规则 -->
   <view class="card">
-    <view class="section-title">文件名规则设置</view>
+    <view class="section-title">数据提取规则</view>
+    <t-input label="文件名匹配规则" placeholder="请输入正则表达式" value="{{filenamePattern}}" data-field="filenamePattern" bind:change="onInputChange" />
     
-    <view class="form-item">
-      <view class="form-label">文件名匹配规则</view>
-      <t-input value="{{filenamePattern}}" placeholder="输入正则表达式" bind:change="onPatternChange" />
-      <view class="help-text">使用正则表达式，括号内为捕获组，用于提取日期。例如：(\d+)月(\d+)日财报\.xlsx</view>
-    </view>
+    <view class="subsection-title">按关键词查找行</view>
+    <t-input label="行关键词" placeholder="如: 小计" value="{{rowKeyword}}" data-field="rowKeyword" bind:change="onInputChange" />
+    <t-input label="在哪列搜索" type="number" placeholder="1代表A列" value="{{rowSearchColumn}}" data-field="rowSearchColumn" bind:change="onInputChange" />
+
+    <view class="subsection-title">按关键词查找列</view>
+    <t-input label="列关键词" placeholder="如: 大件车间" value="{{colKeyword}}" data-field="colKeyword" bind:change="onInputChange" />
+    <t-input label="在哪行搜索" type="number" placeholder="如: 2" value="{{colSearchRow}}" data-field="colSearchRow" bind:change="onInputChange" />
   </view>
 
-  <!-- 数据单元格设置 -->
-  <view class="card">
-    <view class="section-title">数据单元格设置</view>
-    
-    <view class="form-item">
-      <view class="form-label">目标单元格位置</view>
-      <view class="cell-input-group">
-        <view class="cell-input-item">
-          <t-input type="number" value="{{rowIndex}}" placeholder="行号" bind:change="onRowChange" />
-          <view class="help-text">行号</view>
-        </view>
-        <view class="cell-input-item">
-          <t-input type="number" value="{{columnIndex}}" placeholder="列号" bind:change="onColumnChange" />
-          <view class="help-text">列号</view>
-        </view>
-      </view>
-      <view class="help-text">指定要提取数据的单元格位置（例如：第2行第3列对应Excel中的C2）</view>
-    </view>
-  </view>
-
-  <!-- 数据管理 -->
+  <!-- 数据统计 -->
   <view class="card">
     <view class="section-title">数据管理</view>
     <t-cell title="当前记录总数" note="{{recordCount}} 条" />

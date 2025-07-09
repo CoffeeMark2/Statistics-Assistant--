@@ -6,14 +6,15 @@
             <view class="dashboard-title">总金额</view>
             <view class="dashboard-amount">¥ {{totalAmount}}</view>
         </view>
-
-        <!-- 时间筛选 Tabs -->
-        <t-tabs value="{{activeTab}}" bind:change="onTabChange">
-            <t-tab-panel label="全部" value="all" />
-            <t-tab-panel label="本年" value="year" />
-            <t-tab-panel label="本季度" value="quarter" />
-            <t-tab-panel label="本月" value="month" />
-        </t-tabs>
+        <!-- 顶栏 -->
+        <view class="header">
+            <t-tabs default-value="month" bind:change="onTabChange">
+                <t-tab-panel label="周" value="week" />
+                <t-tab-panel label="月" value="month" />
+                <t-tab-panel label="年" value="year" />
+                <t-tab-panel label="全部" value="all" />
+            </t-tabs>
+        </view>
 
         <!-- 明细列表 -->
         <view class="card">

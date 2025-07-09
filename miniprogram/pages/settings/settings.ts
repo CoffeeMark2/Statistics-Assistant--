@@ -1,18 +1,27 @@
 import { getRecords, saveRecords } from '../../utils/storage';
 
 const defaultSettings = {
+    // --- 旧设置 ---
     filenamePattern: '(\\d+)月(\\d+)日.*\\.xlsx?$',
-    rowIndex: 26,
-    columnIndex: 2,
+
+
+    // --- 新增的动态查找设置 ---
+    rowKeyword: '小计',
+    rowSearchColumn: 1, // 1代表A列
+    colKeyword: '大件车间',
+    colSearchRow: 2, // 查找第2行
 };
 
 Page({
     data: {
         filenamePattern: '',
-        rowIndex: '',
-        columnIndex: '',
         recordCount: 0,
         dialogVisible: false,
+        // 新增字段
+        rowKeyword: '',
+        rowSearchColumn: '',
+        colKeyword: '',
+        colSearchRow: '',
     },
 
     onShow() {
@@ -42,8 +51,11 @@ Page({
             const settings = wx.getStorageSync('settings') || defaultSettings;
             this.setData({
                 filenamePattern: settings.filenamePattern,
-                rowIndex: settings.rowIndex.toString(),
-                columnIndex: settings.columnIndex.toString(),
+                // 更新所有字段
+                rowKeyword: settings.rowKeyword,
+                rowSearchColumn: settings.rowSearchColumn.toString(),
+                colKeyword: settings.colKeyword,
+                colSearchRow: settings.colSearchRow.toString(),
             });
         } catch (e) {
             console.error('加载设置失败:', e);
@@ -53,8 +65,11 @@ Page({
     saveSettings() {
         const newSettings = {
             filenamePattern: this.data.filenamePattern || defaultSettings.filenamePattern,
-            rowIndex: parseInt(this.data.rowIndex) || defaultSettings.rowIndex,
-            columnIndex: parseInt(this.data.columnIndex) || defaultSettings.columnIndex,
+            // 更新所有字段
+            rowKeyword: this.data.rowKeyword || defaultSettings.rowKeyword,
+            rowSearchColumn: parseInt(this.data.rowSearchColumn) || defaultSettings.rowSearchColumn,
+            colKeyword: this.data.colKeyword || defaultSettings.colKeyword,
+            colSearchRow: parseInt(this.data.colSearchRow) || defaultSettings.colSearchRow,
         };
 
         try {
@@ -188,25 +203,16 @@ Page({
         }
     },
 
-    // 行号变更
-    onRowChange(e: any) {
-        this.setData({
-            rowIndex: e.detail.value
-        });
-    },
-
-    // 列号变更
-    onColumnChange(e: any) {
-        this.setData({
-            columnIndex: e.detail.value
-        });
-    },
+    
 
     onRestoreDefault() {
         this.setData({
             filenamePattern: defaultSettings.filenamePattern,
-            rowIndex: defaultSettings.rowIndex.toString(),
-            columnIndex: defaultSettings.columnIndex.toString(),
+            // 更新所有字段
+            rowKeyword: defaultSettings.rowKeyword,
+            rowSearchColumn: defaultSettings.rowSearchColumn.toString(),
+            colKeyword: defaultSettings.colKeyword,
+            colSearchRow: defaultSettings.colSearchRow.toString(),
         });
         this.saveSettings();
         wx.showToast({

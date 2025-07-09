@@ -11,7 +11,7 @@ const app = getApp<IAppOption>();
 
 Page({
     data: {
-        activeTab: 'all', // 默认显示全部
+        activeTab: 'month', // 默认显示月
         totalAmount: '0.00',
         showActionMenu: false,
         allRecords: [] as RecordItem[], // 新增：存储所有记录
@@ -61,6 +61,13 @@ Page({
         let filteredRecords = [];
 
         switch (range) {
+            case 'week': {
+                now.setHours(0, 0, 0, 0);
+                const day = now.getDay() === 0 ? 7 : now.getDay(); // 将周日(0)映射为7
+                const startOfWeek = new Date(now.getTime() - (day - 1) * 24 * 60 * 60 * 1000);
+                filteredRecords = allRecords.filter((r: any) => r.timestamp >= startOfWeek.getTime());
+                break;
+            }
             case 'month': {
                 const year = now.getFullYear();
                 const month = now.getMonth();

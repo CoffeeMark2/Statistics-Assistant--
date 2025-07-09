@@ -1,9 +1,34 @@
 import { formatNumber, extractDateFromFilename, parseAmount } from '../../utils/util';
 import { getRecords, saveRecords } from '../../utils/storage';
 
-
 const fs = wx.getFileSystemManager();
 const XLSX = require('../../utils/xlsx.mini.min.js');
+
+const findRowIndex = (worksheet: any, keyword: string, searchColumn: number): number => {
+    const columnLetter = XLSX.utils.encode_col(searchColumn - 1);
+    const range = XLSX.utils.decode_range(worksheet['!ref'] || 'A1:A1');
+    for (let R = range.s.r; R <= range.e.r; ++R) {
+        const cellAddress = columnLetter + (R + 1);
+        const cell = worksheet[cellAddress];
+        if (cell && cell.v && String(cell.v).trim() === keyword) {
+            return R + 1; // Return 1-based row index
+        }
+    }
+    return -1; // Not found
+};
+
+const findColIndex = (worksheet: any, keyword: string, searchRow: number): number => {
+    const range = XLSX.utils.decode_range(worksheet['!ref'] || 'A1:A1');
+    for (let C = range.s.c; C <= range.e.c; ++C) {
+        const cellAddress = XLSX.utils.encode_cell({ r: searchRow - 1, c: C });
+        const cell = worksheet[cellAddress];
+        if (cell && cell.v && String(cell.v).trim() === keyword) {
+            return C + 1; // Return 1-based column index
+        }
+    }
+    return -1; // Not found
+};
+
 
 Page({
     data: {
@@ -12,8 +37,7 @@ Page({
         selectedCount: 0,
         totalAmount: '0.00',
         filenamePattern: '(\\d+)月(\\d+)日.*\\.xlsx?$',
-        rowIndex: 26,
-        columnIndex: 3,
+
 
         // for year picker
         yearVisible: false,
@@ -21,6 +45,12 @@ Page({
         yearValue: new Date(new Date().getFullYear(), 0, 1).getTime(),
         start: '2020-01-01 00:00:00',
         end: '2060-09-09 12:12:12',
+
+        // Add new settings fields
+        rowKeyword: '',
+        rowSearchColumn: 1,
+        colKeyword: '',
+        colSearchRow: 2,
     },
 
     onLoad() {
@@ -31,14 +61,15 @@ Page({
     // 加载设置
     loadSettings() {
         try {
-            const settings = wx.getStorageSync('settings');
-            if (settings) {
-                this.setData({
-                    filenamePattern: settings.filenamePattern || this.data.filenamePattern,
-                    rowIndex: parseInt(settings.rowIndex) || this.data.rowIndex,
-                    columnIndex: parseInt(settings.columnIndex) || this.data.columnIndex
-                });
-            }
+            const settings = wx.getStorageSync('settings') || {};
+            this.setData({
+                filenamePattern: settings.filenamePattern || '(\\d+)月(\\d+)日.*\\.xlsx?$',
+                // Load new settings
+                rowKeyword: settings.rowKeyword || '小计',
+                rowSearchColumn: settings.rowSearchColumn || 1,
+                colKeyword: settings.colKeyword || '大件车间',
+                colSearchRow: settings.colSearchRow || 2,
+            });
         } catch (e) {
             console.error('加载设置失败:', e);
         }
@@ -128,88 +159,71 @@ Page({
 
         const validFiles = this.data.files.filter((file: any) => file.valid && file.selected);
         const yearToUse = this.data.yearText;
-        const rowIndex = this.data.rowIndex;
-        const colIndex = this.data.columnIndex;
+        // Get new settings from data
+        const { rowKeyword, rowSearchColumn, colKeyword, colSearchRow } = this.data;
 
         const previewPromises = validFiles.map(async (file: any) => {
-            const date = extractDateFromFilename(file.name, this.data.filenamePattern, yearToUse);
-            const cellPosition = `${String.fromCharCode(64 + colIndex)}${rowIndex}`;
             let amount = 0;
             let formattedAmount = '0.00';
             let parseError = '';
+            let cellPosition = 'N/A';
 
             try {
-                // 1. 异步读取文件内容
                 const arrayBuffer = await new Promise<ArrayBuffer>((resolve, reject) => {
-                    fs.readFile({
-                        filePath: file.path,
-                        success: (res) => {
-                            const data = res.data;
-                            if (data instanceof ArrayBuffer) {
-                                console.log(`[文件: ${file.name}] -> 步骤1: 文件读取成功，得到 ArrayBuffer，大小: ${data.byteLength} 字节`);
-                                resolve(data);
-                            } else {
-                                console.log(`[文件: ${file.name}] -> 步骤1: 文件读取成功，但格式为 String，长度: ${data.length} 字符`);
-                                reject(new Error('Expected file content to be ArrayBuffer, but received string.'));
-                            }
-                        },
-                        fail: reject,
-                    });
+                    fs.readFile({ filePath: file.path, success: (res) => resolve(res.data as ArrayBuffer), fail: reject });
                 });
 
-                // 2. 使用xlsx库解析
                 const workbook = XLSX.read(arrayBuffer, { type: 'array' });
-                console.log(`[文件: ${file.name}] -> 步骤2: Workbook (工作簿) 解析成功。`, workbook);
+                const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+                
+                // --- DYNAMIC LOOKUP LOGIC ---
+                const targetRow = findRowIndex(worksheet, rowKeyword, rowSearchColumn);
+                if (targetRow === -1) {
+                    throw new Error(`未找到行关键词: "${rowKeyword}"`);
+                }
 
-                const firstSheetName = workbook.SheetNames[0];
-                const worksheet = workbook.Sheets[firstSheetName];
-                console.log(`[文件: ${file.name}] -> 步骤3a: 获取到第一个工作表，名称: "${firstSheetName}"`);
+                const targetCol = findColIndex(worksheet, colKeyword, colSearchRow);
+                if (targetCol === -1) {
+                    throw new Error(`未找到列关键词: "${colKeyword}"`);
+                }
 
-                // 3. 定位单元格并提取数据
-                const cellAddress = XLSX.utils.encode_cell({ r: rowIndex - 1, c: colIndex - 1 });
-                console.log(`[文件: ${file.name}] -> 步骤3b: 根据行(${rowIndex})和列(${colIndex})计算出单元格地址: "${cellAddress}"`);
-
+                cellPosition = `${XLSX.utils.encode_col(targetCol - 1)}${targetRow}`;
+                const cellAddress = XLSX.utils.encode_cell({ r: targetRow - 1, c: targetCol - 1 });
                 const cell = worksheet[cellAddress];
                 const rawValue = cell ? cell.v : undefined;
-                console.log(`[文件: ${file.name}] -> 步骤3c: 从单元格 "${cellAddress}" 提取到的原始值 (rawValue):`, rawValue);
-
-
+                
                 // 4. 安全性检查和转换
                 if (rawValue === undefined || rawValue === null || rawValue === '') {
-                    parseError = '单元格为空';
-                    amount = 0;
+                    parseError = '目标单元格为空';
                 } else {
-                    const parsed = parseAmount(rawValue); // 使用工具函数处理金额
+                    const parsed = parseAmount(rawValue);
                     if (isNaN(parsed)) {
-                        parseError = `无法解析金额`;
-                        amount = 0;
+                        parseError = '无法解析为金额';
                     } else {
                         amount = parsed;
                     }
                 }
-
+                
                 formattedAmount = formatNumber(amount);
 
             } catch (e: any) {
                 console.error(`解析文件 ${file.name} 失败:`, e);
-                parseError = '文件解析失败';
-                amount = 0;
+                parseError = e.message || '文件解析失败';
             }
 
+            const date = extractDateFromFilename(file.name, this.data.filenamePattern, yearToUse);
             return {
                 name: file.name,
                 date: date ? `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}` : '',
                 cellPosition,
                 amount,
                 formattedAmount,
-                parseError // 新增错误信息字段
+                parseError,
             };
         });
 
         const previewFiles = await Promise.all(previewPromises);
-
         wx.hideLoading();
-
         this.setData({ previewFiles });
         this.calculateTotal();
     },
